@@ -1,0 +1,8 @@
+library(datasets) # pro mtcars
+
+# Instalace:
+install.packages("ggplot2")
+install.packages("plyr")
+
+library(ggplot2)
+library(plyr)
