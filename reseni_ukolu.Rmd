@@ -1,0 +1,85 @@
+Domácí cvičení
+========================================================
+Struktura cvičení já následující:  
+
+1. Import dat
+2. Manipulace s daty
+3. Popisná statistika
+4. Vizualizace
+
+Data pocházejí z tohoto [zdroje](http://archive.ics.uci.edu/ml/datasets/Wholesale+customers).
+
+Import dat
+-------------------------
+Data je možné stáhnout přímo z internetu, nebo načíst z lokálního disku (druhý příkaz, který jsem zakomentoval. Vše za znakem # je eRkem přeskočeno).
+```{r}
+url <- "http://archive.ics.uci.edu/ml/machine-learning-databases/00292/Wholesale%20customers%20data.csv"
+data.in <- read.table(url, sep=",", header=TRUE)
+#data.in <- read.table("wholesale_customers_data.csv", sep=",", header=TRUE) # pro lokální data
+```
+
+Struktura dat
+-------------------------
+Strukturu dat (počet pozorování a proměnných, datové typy, a zobrazení prvních pár pozorování) zjistíme funkcí *str*:
+```{r}
+str(data.in)
+```
+Náš datový soubor obsahuje `r nrow(data.in)` řádků a `r ncol(data.in)` sloupců.  
+
+R odkazuje na hodnoty pomocí maticového zápisu řádek $\times$ sloupec. Namísto čísel sloupců je ale něky vhodné odkazovat přímo na jejich názvy.
+```{r}
+data.in[c(1, 5), c(4, 6)]
+data.in[c(1, 5), c("Milk", "Frozen")]
+```
+A samostatné zobrazení hodnoty:
+```{r}
+data.in[1, "Milk"] # v případě jednoho čísla/character není není nutné c()
+data.in[5, "Frozen"]
+```
+Někdy je potřeba odkazovat na určité pozorování, které je někde "uvnitř"" dat, a jehož pozice je neznámá (jako například páté pozorování v minulém příkladu). Typicky se jedná o extrémní nebo NA hodnoty. Necháme R najít číslo řádku. Toto číslo nemusíme ani "vidět", můžeme ho uložit do proměnné, nebo ho nechat v příkazu, jak je uvedeno níže.
+```{r}
+data.in[which.max(data.in$Milk),] # which.max(data.in$Milk) se rovná 87, je možné vložit místo čísla.
+```
+
+Popisná statistika
+-------------------------
+Základní popisná funkce je *summary*:
+```{r}
+summary(data.in)
+```
+Můžeme se přesvědčit, že maximální hodnota *Milk* je stejná v tomto výstupu, jako v předchozí analýze.  
+I když předchozí výstup popisuje míru variability (například kvartilovým rozpětím), vždy je výhodné podívat se na rozptyl proměnných:
+```{r}
+apply(data.in, 2, var)
+```
+Tyto hodnoty můžeme  využít později, například v analýze rozptylu.  
+
+Podívejme se, jaké jsou průměrné hodnoty proměnné *Milk* v regionech (tzv. podmíněné průměry):
+```{r}
+prumery <- tapply(data.in$Milk, data.in$Region, mean)
+prumery
+```
+Průměrná hodnota v regionu 1 je `r prumery[1]`, což je více než v regionu 2, kde je pruměr `r prumery[2]` .  
+
+Míru intenzity lineárního vztahu mezi proměnnými je možné stanovit Pearsonovým korelačním koeficientem. Program R používá funkci *cor*. Hodnotu korelačního koeficientu mezi poptávkou po *Detergents_Paper* a *Grocery* určíme:
+```{r}
+korelace <- cor(data.in$Detergents_Paper, data.in$Grocery)
+korelace
+```
+Hodnota korelačního koeficientu `r korelace ` ukazuje na silný a přímý (pozitivní) vztah mezi proměnnými.
+
+Vizualizace
+-------------------------
+Pro základní vizualizaci je vhodné použít původní funkce R,jako například *plot()*, nebo *hist()*.
+```{r}
+hist(data.in$Milk, main="Histogram proměnné Milk")
+```
+Histogram ukazuje na vychýlené rozdělení proměnné *Milk*. Z tohoto důvodu bychom němeli více používat průměrné hodnoty, jako ukazatele střední hodnoty (lepší mírou by byl např. medián). Tuto skutečnost je možné vyčíst i ze *summary()*, které jsme provedli dříve.  
+
+Pro tvorbu podmíněných grafů je vhodné použít knihovnu *lattice*. Ta obsahuje několik typů grafů, jako boxplot nebo scatter plot (rozptylový graf).  
+Někdy je nutné doinstalovat speciální knihovnu (není tento případ). Pokud budete pracovat s někým, o kom si nejste jisti, zda má nainstalovanou knihovnu, doporučuji za příkaz aktivující knihovnu *library(knihovna)* vložit komentář s instalačním příkazem. 
+```{r}
+library(lattice) # install.packages("lattice")
+xyplot(data.in$Detergents_Paper ~ data.in$Grocery| factor(data.in$Region))
+```
+Rozptylové grafy zaznamenávají vztah mezi proměnnými ve všech sledovaných regionech. Z grafů je možné vyčíst, že chování spotřebitelů je přibližně stejné - s růstem *Detergents_Paper* obvykle roste *Grocery* (není ovšem možné tvrdit, že růst *Detergents_Paper* vyvolá nárůst v *Grocery*). Tato vizualizace je v souladu s naší dříve vypočítanou hodnotou korelačního koeficientu.
