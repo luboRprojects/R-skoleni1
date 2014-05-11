@@ -1,9 +1,9 @@
 Domácí cvičení
 ========================================================
-Struktura cvičení já následující:  
+Struktura cvičení je následující:  
 
 1. Import dat
-2. Manipulace s daty
+2. Struktura dat
 3. Popisná statistika
 4. Vizualizace
 
@@ -26,7 +26,7 @@ str(data.in)
 ```
 Náš datový soubor obsahuje `r nrow(data.in)` řádků a `r ncol(data.in)` sloupců.  
 
-R odkazuje na hodnoty pomocí maticového zápisu řádek $\times$ sloupec. Namísto čísel sloupců je ale něky vhodné odkazovat přímo na jejich názvy.
+R odkazuje na hodnoty pomocí maticového zápisu řádek $\times$ sloupec. Namísto čísel sloupců je ale někdy vhodné odkazovat přímo na jejich názvy.
 ```{r}
 data.in[c(1, 5), c(4, 6)]
 data.in[c(1, 5), c("Milk", "Frozen")]
@@ -36,7 +36,7 @@ A samostatné zobrazení hodnoty:
 data.in[1, "Milk"] # v případě jednoho čísla/character není není nutné c()
 data.in[5, "Frozen"]
 ```
-Někdy je potřeba odkazovat na určité pozorování, které je někde "uvnitř"" dat, a jehož pozice je neznámá (jako například páté pozorování v minulém příkladu). Typicky se jedná o extrémní nebo NA hodnoty. Necháme R najít číslo řádku. Toto číslo nemusíme ani "vidět", můžeme ho uložit do proměnné, nebo ho nechat v příkazu, jak je uvedeno níže.
+V situaci, kdy je potřeba odkazovat na určité pozorování, které je "někde uvnitř" dat, a jehož pozice je neznámá (jako například páté pozorování v minulém příkladu) musíme využít identifikačních funkcí (*which*, *is.na* apod.). Typicky se jedná o problematické extrémní nebo NA hodnoty. V našem případě necháme R najít číslo řádku s maximální hodnotou v daném sloupci. Toto číslo nemusíme ani "vidět", můžeme ho uložit do proměnné, nebo ho nechat v příkazu, jak je uvedeno níže.
 ```{r}
 data.in[which.max(data.in$Milk),] # which.max(data.in$Milk) se rovná 87, je možné vložit místo čísla.
 ```
